@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang='ru'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1, viewport-fit=cover'>
+<meta name='apple-mobile-web-app-capable' content='yes'>
+<meta name='apple-mobile-web-app-status-bar-style' content='default'>
+<meta name='apple-mobile-web-app-title' content='День'>
+<meta name='theme-color' content='#f3ede2'>
+<title>День</title>
+<style>
+:root{--cream:#f3ede2;--card:#fbf8f2;--ink:#141414;--mute:#8d867a;--line:#e4dccd;--ease:cubic-bezier(.22,.8,.2,1)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:-apple-system,system-ui,sans-serif;padding:calc(env(safe-area-inset-top) + 12px) 16px calc(env(safe-area-inset-bottom) + 40px);max-width:560px;margin-inline:auto;overflow-x:hidden}
+h1{font-family:ui-serif,Georgia,serif;font-weight:500;font-size:40px;letter-spacing:-1px;margin:18px 0 6px}
+@keyframes rise{from{opacity:0;transform:translate3d(0,16px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.22)}100%{transform:scale(1)}}
+@keyframes fromR{from{opacity:0;transform:translate3d(40px,0,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+@keyframes fromL{from{opacity:0;transform:translate3d(-40px,0,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+.rise{opacity:0;animation:rise .6s var(--ease) forwards}
+#day.r{animation:fromR .45s var(--ease)}
+#day.l{animation:fromL .45s var(--ease)}
+.nav{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.nav .arr{width:42px;height:42px;border-radius:50%;border:none;background:var(--card);color:var(--ink);font-size:22px;box-shadow:0 4px 14px rgba(20,20,20,.06);transition:transform .2s var(--ease);flex:none}
+.nav .arr:active{transform:scale(.88)}
+.date{flex:1;text-align:center;text-transform:capitalize;font-size:17px}
+.chips{display:flex;gap:8px;margin-bottom:14px;align-items:center}
+.chip{background:var(--ink);color:var(--cream);border-radius:20px;padding:7px 14px;font-size:13px}
+.chip.ghost{background:var(--card);color:var(--ink);border:none;font:inherit;font-size:13px}
+.bar{height:6px;background:var(--line);border-radius:6px;overflow:hidden;margin-bottom:16px}
+.bar i{display:block;height:100%;width:100%;background:var(--ink);border-radius:6px;transform-origin:left;transform:scaleX(0);transition:transform .7s var(--ease);will-change:transform}
+.card{background:var(--card);border-radius:26px;padding:6px 14px;margin-bottom:14px;box-shadow:0 6px 24px rgba(20,20,20,.06)}
+.task{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--line);transition:opacity .3s var(--ease),transform .3s var(--ease);animation:rise .45s var(--ease) both;background:var(--card)}
+.task:last-child{border-bottom:none}
+.task.out{opacity:0;transform:translate3d(44px,0,0)}
+.task.drag{transform:scale(1.03);box-shadow:0 10px 28px rgba(0,0,0,.18);border-radius:14px;position:relative;z-index:2;transition:transform .2s var(--ease)}
+.handle{touch-action:none;color:var(--mute);padding:6px 4px;font-size:18px;letter-spacing:-3px;user-select:none;-webkit-user-select:none}
+.chk{width:26px;height:26px;border-radius:50%;border:2px solid var(--ink);background:transparent;padding:0;flex:none;position:relative;overflow:hidden}
+.chk::before{content:'';position:absolute;inset:0;background:var(--ink);transform:scale(0);border-radius:50%;transition:transform .35s var(--ease)}
+.chk.on::before{transform:scale(1)}
+.chk.on{animation:pop .35s var(--ease)}
+.chk::after{content:'';position:absolute;left:8px;top:3px;width:6px;height:12px;border:solid var(--cream);border-width:0 2px 2px 0;transform:rotate(45deg) scale(0);transition:transform .3s var(--ease) .05s}
+.chk.on::after{transform:rotate(45deg) scale(1)}
+input,select{font:inherit;color:var(--ink);background:transparent;border:none;outline:none;min-width:0}
+.time{width:76px;color:var(--mute);font-variant-numeric:tabular-nums;flex:none}
+.name{flex:1;font-size:17px;transition:color .3s}
+.done .name{color:var(--mute);text-decoration:line-through}
+.del{background:none;border:none;color:var(--mute);font-size:22px;padding:2px 6px}
+.add{display:flex;gap:8px;margin-bottom:18px}
+.pill{background:var(--card);border-radius:20px;padding:13px 16px;box-shadow:0 4px 14px rgba(20,20,20,.05)}
+.add .t{flex:1}
+.btn{background:var(--ink);color:var(--cream);border:none;border-radius:20px;padding:13px 18px;font:inherit;font-weight:600;transition:transform .2s var(--ease)}
+.btn:active{transform:scale(.93)}
+.money{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.box{background:var(--card);border-radius:26px;padding:16px;box-shadow:0 6px 24px rgba(20,20,20,.06)}
+.box.dark{background:var(--ink);color:var(--cream)}
+.label{color:var(--mute);font-size:13px}
+.sum{font-family:ui-serif,Georgia,serif;font-size:28px;margin:4px 0 10px}
+.box input,.box select{width:100%;background:var(--cream);border-radius:14px;padding:11px;margin-bottom:8px}
+.box.dark input,.box.dark select{background:#2a2a2a;color:var(--cream)}
+.box .btn{width:100%}
+.box.dark .btn{background:var(--cream);color:var(--ink)}
+.total{background:var(--card);border-radius:26px;padding:20px;text-align:center;box-shadow:0 6px 24px rgba(20,20,20,.06);margin-bottom:14px}
+.total .sum{font-size:48px;margin:2px 0}
+.hrow{display:flex;gap:6px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);animation:rise .4s var(--ease) both}
+.hrow:last-child{border-bottom:none}
+.hrow .l{flex:1}
+.hrow .c{color:var(--mute);font-size:12px;max-width:92px}
+.hrow .v{width:84px;text-align:right}
+.hrow.earn .v{font-weight:600}
+.empty{color:var(--mute);padding:12px 0;text-align:center;font-size:14px}
+.st{padding:10px 0;border-bottom:1px solid var(--line)}
+.st:last-child{border-bottom:none}
+.st b{font-weight:600}
+.srow{display:flex;justify-content:space-between;font-size:15px}
+.cat{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:14px}
+.cat span:first-child{width:96px}
+.cat span:last-child{width:76px;text-align:right}
+.track{flex:1;height:8px;background:var(--line);border-radius:8px;overflow:hidden}
+.track i{display:block;height:100%;width:100%;background:var(--ink);border-radius:8px;transform-origin:left;transform:scaleX(0);transition:transform .7s var(--ease)}
+.title2{font-family:ui-serif,Georgia,serif;font-size:20px;padding:12px 0 2px}
+</style>
+</head>
+<body>
+<h1 class='rise'>Мой день</h1>
+<div class='nav rise' style='animation-delay:.05s'>
+<button class='arr' id='prev'>‹</button>
+<div class='date' id='date'></div>
+<button class='arr' id='next'>›</button>
+</div>
+<div class='chips rise' style='animation-delay:.1s'>
+<div class='chip' id='streak'></div>
+<button class='chip ghost' id='today'>К сегодняшнему дню</button>
+</div>
+<div id='day'>
+<div class='bar'><i id='prog'></i></div>
+<div class='card' id='tasks'></div>
+<div class='add'>
+<input class='pill' type='time' id='newTime' value='12:00' style='width:110px'>
+<input class='pill t' type='text' id='newName' placeholder='Новое дело'>
+<button class='btn' id='addTask'>+</button>
+</div>
+<div class='money'>
+<div class='box'><div class='label'>Заработано</div><div class='sum' id='earnSum'>0</div>
+<input type='text' id='earnL' placeholder='За что'><input type='number' id='earnIn' placeholder='Сумма' inputmode='decimal'>
+<button class='btn' id='addEarn'>Добавить</button></div>
+<div class='box dark'><div class='label'>Потрачено</div><div class='sum' id='spendSum'>0</div>
+<input type='text' id='spendL' placeholder='На что'><select id='spendC'></select><input type='number' id='spendIn' placeholder='Сумма' inputmode='decimal'>
+<button class='btn' id='addSpend'>Добавить</button></div>
+</div>
+<div class='card' id='hist'></div>
+</div>
+<div class='total'><div class='label'>Всего денег</div><div class='sum' id='total'>0</div></div>
+<div class='card' id='stats'></div>
+<script>
+const KEY='day-v3';
+const uid=()=>Math.random().toString(36).slice(2,9);
+const dk=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const CATS=['Еда','Зал','Развлечения','Другое'];
+const fmt=n=>n.toLocaleString('ru-RU',{maximumFractionDigits:2});
+const $=id=>document.getElementById(id);
+function el(tag,props){const e=document.createElement(tag);Object.assign(e,props||{});return e}
+function load(){
+const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s)return s;
+const o=JSON.parse(localStorage.getItem('day-v2')||'null');const today=dk(new Date());
+if(o)return{tasks:o.tasks.map(t=>({id:t.id,t:t.t,n:t.n})),checks:{},money:o.money.map(m=>({id:m.id,k:m.k,v:m.v,l:m.l||'',c:'Другое',date:today}))};
+return{tasks:[['07:00','Встать'],['08:00','Поесть'],['09:00','Сходить на работу'],['18:00','Сходить в зал'],['20:00','Поиграть'],['22:00','Отдохнуть']].map(a=>({id:uid(),t:a[0],n:a[1]})),checks:{},money:[]}}
+let S=load();
+const save=()=>localStorage.setItem(KEY,JSON.stringify(S));
+let cur=new Date();cur.setHours(12,0,0,0);
+const key=()=>dk(cur);
+const isDone=(day,id)=>!!(S.checks[day]&&S.checks[day][id]);
+const allDone=day=>S.tasks.length>0&&S.tasks.every(t=>isDone(day,t.id));
+function streak(){const d=new Date();d.setHours(12,0,0,0);if(!allDone(dk(d)))d.setDate(d.getDate()-1);let n=0;while(n<3650&&allDone(dk(d))){n++;d.setDate(d.getDate()-1)}return n}
+function countTo(node,to){const from=parseFloat(node.dataset.v||0);node.dataset.v=to;if(from===to){node.textContent=fmt(to);return}const t0=performance.now();(function step(t){const p=Math.min((t-t0)/550,1);node.textContent=fmt(from+(to-from)*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(step)})(t0)}
+function renderHead(){
+$('date').textContent=cur.toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'});
+$('today').style.display=key()===dk(new Date())?'none':'block';
+$('streak').textContent='Серия: '+streak()+' дн.'}
+function progress(){
+const k=key();const d=S.tasks.filter(t=>isDone(k,t.id)).length;
+$('prog').style.transform='scaleX('+(S.tasks.length?d/S.tasks.length:0)+')';
+$('streak').textContent='Серия: '+streak()+' дн.'}
+function renderTasks(){
+const box=$('tasks');box.innerHTML='';const k=key();
+if(!S.tasks.length)box.append(el('div',{className:'empty',textContent:'Добавь первое дело ниже'}));
+S.tasks.forEach((t,i)=>{
+const on=isDone(k,t.id);
+const row=el('div',{className:'task'+(on?' done':'')});row.dataset.id=t.id;row.style.animationDelay=(i*0.04)+'s';
+const handle=el('div',{className:'handle',textContent:'⋮⋮'});
+const chk=el('button',{className:'chk'+(on?' on':'')});
+chk.onclick=()=>{const kk=key();S.checks[kk]=S.checks[kk]||{};S.checks[kk][t.id]=!S.checks[kk][t.id];save();chk.classList.toggle('on',S.checks[kk][t.id]);row.classList.toggle('done',S.checks[kk][t.id]);progress()};
+const time=el('input',{type:'time',value:t.t,className:'time'});time.oninput=()=>{t.t=time.value;save()};
+const name=el('input',{type:'text',value:t.n,className:'name'});name.oninput=()=>{t.n=name.value;save()};
+const del=el('button',{className:'del',textContent:'×'});
+del.onclick=()=>{row.classList.add('out');setTimeout(()=>{S.tasks=S.tasks.filter(x=>x.id!==t.id);save();renderTasks();renderHead()},300)};
+handle.onpointerdown=e=>{e.preventDefault();handle.setPointerCapture(e.pointerId);row.classList.add('drag')};
+handle.onpointermove=e=>{if(!row.classList.contains('drag'))return;
+for(const r of [...box.children]){if(r===row)continue;const b=r.getBoundingClientRect();
+if(e.clientY>b.top&&e.clientY<b.bottom){box.insertBefore(row,e.clientY<b.top+b.height/2?r:r.nextSibling);break}}};
+const end=()=>{if(!row.classList.contains('drag'))return;row.classList.remove('drag');
+const order=[...box.children].map(r=>r.dataset.id);S.tasks.sort((a,b)=>order.indexOf(a.id)-order.indexOf(b.id));save()};
+handle.onpointerup=end;handle.onpointercancel=end;
+row.append(handle,chk,time,name,del);box.append(row)});
+requestAnimationFrame(progress)}
+function sumRange(from,to,k,cat){return S.money.filter(m=>m.k===k&&m.date>=from&&m.date<=to&&(!cat||m.c===cat)).reduce((s,m)=>s+m.v,0)}
+function renderMoney(){
+const k=key();
+countTo($('earnSum'),sumRange(k,k,'earn'));countTo($('spendSum'),sumRange(k,k,'spend'));
+const all=S.money.reduce((s,m)=>s+(m.k==='earn'?m.v:-m.v),0);countTo($('total'),all);
+const h=$('hist');h.innerHTML='';
+const list=S.money.filter(m=>m.date===k);
+if(!list.length)h.append(el('div',{className:'empty',textContent:'В этот день записей о деньгах нет'}));
+list.slice().reverse().forEach(m=>{
+const row=el('div',{className:'hrow '+m.k});
+const l=el('input',{type:'text',value:m.l||'',placeholder:m.k==='earn'?'доход':'расход',className:'l'});l.oninput=()=>{m.l=l.value;save()};
+row.append(l);
+if(m.k==='spend'){const c=el('select',{className:'c'});CATS.forEach(x=>{const o=el('option',{value:x,textContent:x});if(x===m.c)o.selected=true;c.append(o)});c.onchange=()=>{m.c=c.value;save();renderStats()};row.append(c)}
+const v=el('input',{type:'number',value:m.v,className:'v',inputMode:'decimal'});
+v.onchange=()=>{const n=parseFloat(v.value);if(n>0){m.v=n;save();renderMoney()}else v.value=m.v};
+const del=el('button',{className:'del',textContent:'×'});
+del.onclick=()=>{S.money=S.money.filter(x=>x.id!==m.id);save();renderMoney()};
+row.append(el('div',{textContent:m.k==='earn'?'+':'−'}),v,del);h.append(row)});
+renderStats()}
+function renderStats(){
+const now=new Date();const to=dk(now);
+const w=new Date();w.setDate(w.getDate()-6);const wf=dk(w);
+const mf=to.slice(0,8)+'01';
+const box=$('stats');box.innerHTML='';
+box.append(el('div',{className:'title2',textContent:'Итоги'}));
+[['Последние 7 дней',wf],['Этот месяц',mf]].forEach(a=>{
+const e=sumRange(a[1],to,'earn'),s=sumRange(a[1],to,'spend');
+const d=el('div',{className:'st'});
+d.innerHTML='<div class=\'srow\'><b>'+a[0]+'</b><span>'+fmt(e-s)+'</span></div><div class=\'srow\' style=\'color:#8d867a\'><span>заработано '+fmt(e)+'</span><span>потрачено '+fmt(s)+'</span></div>';
+box.append(d)});
+box.append(el('div',{className:'label',textContent:'Траты за месяц по категориям',style:'padding:12px 0 4px'}));
+const vals=CATS.map(c=>sumRange(mf,to,'spend',c));const max=Math.max(1,...vals);
+CATS.forEach((c,i)=>{
+const r=el('div',{className:'cat'});const tr=el('div',{className:'track'});const bar=el('i');tr.append(bar);
+r.append(el('span',{textContent:c}),tr,el('span',{textContent:fmt(vals[i])}));box.append(r);
+requestAnimationFrame(()=>requestAnimationFrame(()=>{bar.style.transform='scaleX('+(vals[i]/max)+')'}))})}
+function renderAll(){renderHead();renderTasks();renderMoney()}
+function go(delta){cur.setDate(cur.getDate()+delta);swap(delta)}
+function swap(dir){const w=$('day');w.classList.remove('l','r');void w.offsetWidth;w.classList.add(dir>0?'r':'l');renderAll()}
+$('prev').onclick=()=>go(-1);
+$('next').onclick=()=>go(1);
+$('today').onclick=()=>{const d=new Date();d.setHours(12,0,0,0);const dir=d>cur?1:-1;cur=d;swap(dir)};
+$('addTask').onclick=()=>{const n=$('newName').value.trim();const t=$('newTime').value||'12:00';if(!n)return;S.tasks.push({id:uid(),t,n});$('newName').value='';save();renderTasks();renderHead()};
+function addMoney(k){const a=$(k+'In'),l=$(k+'L');const v=parseFloat(a.value.replace(',','.'));if(!v||v<=0)return;
+S.money.push({id:uid(),k,v,l:l.value.trim(),c:k==='spend'?$('spendC').value:'',date:key()});a.value='';l.value='';save();renderMoney()}
+$('addEarn').onclick=()=>addMoney('earn');
+$('addSpend').onclick=()=>addMoney('spend');
+CATS.forEach(c=>$('spendC').append(el('option',{value:c,textContent:c})));
+renderAll();
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){const d=new Date();if(dk(d)!==dk(cur)&&key()===dk(new Date(Date.now()-864e5))){}renderHead()}});
+</script>
+</body>
+</html>
